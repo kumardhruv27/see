@@ -20,12 +20,12 @@ pipeline{
                 sh 'mvn deploy'
             }
         }
-        stage('docker'){
+        stage('docker_build'){
             steps{
                 sh 'docker build -t demo:latest .'
                 sh 'docker run -d -p 8081:8081 demo:latest'
             }
-        }stage('swarm'){
+        }stage('docker_swarm'){
             steps{
                 sh 'docker swarm init'
                 sh 'docker stack deploy -c docker-compose.yml demo'
