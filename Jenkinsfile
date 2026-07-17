@@ -1,13 +1,6 @@
 pipeline {
     agent any
 
-    tools {
-        maven 'Maven'
-    }
-
-    environment {
-        IMAGE_NAME = 'javaapp'
-    }
 
     stages {
         stage('Clone') {
