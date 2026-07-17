@@ -1,6 +1,7 @@
 pipeline {
     agent any
-
+    
+    branch 'main'
 
     stages {
         stage('Clone') {
