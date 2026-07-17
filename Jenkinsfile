@@ -1,34 +1,42 @@
-
-
-pipeline{
+pipeline {
     agent any
-    cron('H 0 * * *')
 
-    stages{
-        stage('Build'){
-            steps{
+    tools {
+        maven 'Maven'
+    }
+
+    environment {
+        IMAGE_NAME = 'javaapp'
+    }
+
+    stages {
+        stage('Clone') {
+            steps {
+                git 'https://github.com/kumardhruv27/see.git'
+            }
+        }
+
+        stage('Build Maven') {
+            steps {
                 sh 'mvn clean package'
             }
         }
-        stage('Test'){
-            steps{
-                sh 'mvn test'
+
+        stage('Docker Build') {
+            steps {
+                sh "docker build -t myapp ."
             }
         }
-        stage('Deploy'){
-            steps{
-                sh 'mvn deploy'
-            }
-        }
-        stage('docker_build'){
-            steps{
-                sh 'docker build -t demo:latest .'
-                sh 'docker run -d -p 8081:8081 demo:latest'
-            }
-        }stage('docker_swarm'){
-            steps{
-                sh 'docker swarm init'
-                sh 'docker stack deploy -c docker-compose.yml demo'
+
+        stage('Deploy to Docker Swarm') {
+            steps {
+                sh """
+                    docker service rm java-service || true
+                    docker service create \
+                      --name java-service \
+                      -p 8080:8080 \
+                        myapp:latest
+                """
             }
         }
     }
